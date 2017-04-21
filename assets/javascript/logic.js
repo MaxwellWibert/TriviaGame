@@ -1,19 +1,22 @@
 $(document).ready(function(){
+	var $answerElements = [];
 	function Question(question, rightAnswer, otherAnswers){
 		this.question = question;
 		this.rightAnswer = rightAnswer;
 		this.answers = otherAnswers;
 		this.answers.push(rightAnswer);
-		this.answerElements = [];
 
 		this.display = function(){
 			$("#answerRow").empty();
 			for(var i = 0; i < this.answers.length; i++){
-				answerElement = $("<div class='col-lg-6 col-md-6 col-sm-12 col-xs-12'>" + this.answers[i] + "</div>");
+				answerElement = $("<div/>");
+				answerElement.addClass("col-lg-6 col-md-6 col-sm-12 col-xs-12");
+				answerElement.html(this.answers[i]);
 				$("#answerRow").append(answerElement);
-				this.answerElements.push(answerElement);
+				$answerElements.push(answerElement);
 				this.clickify(i);
 			}
+			$("#question").html(this.question);
 		}
 
 		this.shuffle = function(){
@@ -30,26 +33,27 @@ $(document).ready(function(){
 
 		this.clickify = function(index){
 			if(this.answers[index] === this.rightAnswer){
-				console.log(this.answerElements[index]);
-				this.answerElements[index].on("click",function(index){this.onCorrect(index);});
+				console.log("1 " + $answerElements);
+
+				$answerElements[index].on("click", function(index){currentQuestion.onCorrect(index);});
 			}else{
-				console.log(this.answerElements[index]);
-				this.answerElements[index].on("click",function(index){this.onIncorrect(index);});
+				console.log("2 " + $answerElements);
+				$answerElements[index].on("click", function(index){currentQuestion.onIncorrect(index);});
 			}
 		}
 		this.onCorrect = function(index){
-			this.answerElements[index].css("background", "green");
+			console.log("3 " + $answerElements);
+			$answerElements[index].attr("style", "{background-color: green}");
 
-			setTimeout(function(){
-				nextQuestion();
-			}, 3000);
+			setTimeout(nextQuestion, 3000);
 		}
 
 		this.onIncorrect = function(index){
-			this.answerElements[index].css("background", "green");
-			setTimeout(function(){
-				nextQuestion();
-			}, 3000);
+			console.log("4 " + $answerElements);
+
+			$answerElements[index].attr("style", "{background-color: green}");
+
+			setTimeout(nextQuestion, 3000);
 		}
 
 
@@ -57,6 +61,7 @@ $(document).ready(function(){
 	}
 
 var questions = [];
+var currentQuestion;
 questions.push(new Question("Name the following theorem: Every simply connected, closed 3-manifold is homeomorphic to the 3-sphere.", 
 	"Poincare Conjecture", ["Twin Prime Conjecture", "Riemann Hypothesis", "Fundamental Theorem of Galois Theory"]));
 questions.push(new Question("How many flavors of quarks are there?", "6", ["4", "8", "2"]));
@@ -72,18 +77,14 @@ console.log(questions);
 nextQuestion();
 
 function nextQuestion(){
+	$answerElements = [];
 	var randIndex = randNum(0, questions.length - 1);
-	var question = questions[randIndex];
-	question.display();
+	currentQuestion = questions[randIndex];
+	currentQuestion.display();
 }
-
-
-
 function randNum(start, end){
 	return Math.floor(Math.random()*(end - start) + start + 1);
 }
-
-
 });
 
 
